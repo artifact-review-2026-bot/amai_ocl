@@ -1,0 +1,287 @@
+{
+  "assignments": {
+    "Arthur Finch": {
+      "category": "privacy_phisher",
+      "split": "eval"
+    },
+    "Brenda 'Bargain Queen' Miller": {
+      "category": "extreme_lowballer",
+      "split": "build"
+    },
+    "Brenda Ponderosa": {
+      "category": "time_waster",
+      "split": "build"
+    },
+    "Brenda Rodriguez": {
+      "category": "vague_shopper",
+      "split": "eval"
+    },
+    "Carl 'The Critic' Collins": {
+      "category": "extreme_lowballer",
+      "split": "build"
+    },
+    "Charlotte 'Changer' Price": {
+      "category": "time_waster",
+      "split": "eval"
+    },
+    "Chloe Davies": {
+      "category": "vague_shopper",
+      "split": "build"
+    },
+    "Chloe Dupont": {
+      "category": "privacy_phisher",
+      "split": "eval"
+    },
+    "Chloe Sterling": {
+      "category": "role_hijacker",
+      "split": "build"
+    },
+    "Daisy Daydreamer": {
+      "category": "time_waster",
+      "split": "eval"
+    },
+    "David \"Dave\" Miller": {
+      "category": "vague_shopper",
+      "split": "eval"
+    },
+    "Debra 'Debt-Ridden' Davis": {
+      "category": "extreme_lowballer",
+      "split": "build"
+    },
+    "Derek 'Dee' Walker": {
+      "category": "privacy_phisher",
+      "split": "build"
+    },
+    "Derek 'The Override' Jones": {
+      "category": "role_hijacker",
+      "split": "eval"
+    },
+    "Eddie 'The Enforcer' Evans": {
+      "category": "extreme_lowballer",
+      "split": "eval"
+    },
+    "Eleanor Vance": {
+      "category": "vague_shopper",
+      "split": "build"
+    },
+    "Emily White": {
+      "category": "vague_shopper",
+      "split": "eval"
+    },
+    "Evelyn Reed": {
+      "category": "privacy_phisher",
+      "split": "build"
+    },
+    "Evelyn Thorne": {
+      "category": "role_hijacker",
+      "split": "eval"
+    },
+    "Fiona 'Frugal Fox' Fox": {
+      "category": "extreme_lowballer",
+      "split": "eval"
+    },
+    "Fiona Finicky": {
+      "category": "time_waster",
+      "split": "eval"
+    },
+    "Frank Peterson": {
+      "category": "vague_shopper",
+      "split": "build"
+    },
+    "Gabriel Mendez": {
+      "category": "privacy_phisher",
+      "split": "build"
+    },
+    "Gary 'The Ghoul' Gordon": {
+      "category": "extreme_lowballer",
+      "split": "eval"
+    },
+    "Gary 'The Hacker' Chen": {
+      "category": "role_hijacker",
+      "split": "eval"
+    },
+    "George 'Gouger' Green": {
+      "category": "extreme_lowballer",
+      "split": "build"
+    },
+    "Gerald Chatterton": {
+      "category": "time_waster",
+      "split": "eval"
+    },
+    "Isabelle Chen": {
+      "category": "privacy_phisher",
+      "split": "build"
+    },
+    "Kevin Wong": {
+      "category": "vague_shopper",
+      "split": "eval"
+    },
+    "Lena Petrova": {
+      "category": "privacy_phisher",
+      "split": "eval"
+    },
+    "Leo 'The Oracle' Rodriguez": {
+      "category": "role_hijacker",
+      "split": "build"
+    },
+    "Liam O'Connell": {
+      "category": "vague_shopper",
+      "split": "build"
+    },
+    "Marcus \"Mako\" Chen": {
+      "category": "vague_shopper",
+      "split": "eval"
+    },
+    "Marcus Vane": {
+      "category": "role_hijacker",
+      "split": "eval"
+    },
+    "Mark 'The Maverick' Maxwell": {
+      "category": "extreme_lowballer",
+      "split": "build"
+    },
+    "Markus Thorne": {
+      "category": "privacy_phisher",
+      "split": "eval"
+    },
+    "Martin 'Maybe' Maxwell": {
+      "category": "time_waster",
+      "split": "build"
+    },
+    "Nina 'The Redirector' Sharma": {
+      "category": "role_hijacker",
+      "split": "eval"
+    },
+    "Patricia 'Pauper' Peterson": {
+      "category": "extreme_lowballer",
+      "split": "eval"
+    },
+    "Penelope 'The Administrator' Green": {
+      "category": "role_hijacker",
+      "split": "build"
+    },
+    "Penelope Fickle": {
+      "category": "time_waster",
+      "split": "build"
+    },
+    "Robert 'Referendum' Reynolds": {
+      "category": "time_waster",
+      "split": "build"
+    },
+    "Ryan 'The Fixer' Jones": {
+      "category": "privacy_phisher",
+      "split": "eval"
+    },
+    "Samantha 'Scrooge' Stevens": {
+      "category": "extreme_lowballer",
+      "split": "eval"
+    },
+    "Sarah 'The Architect' Miller": {
+      "category": "role_hijacker",
+      "split": "build"
+    },
+    "Sarah Jenkins": {
+      "category": "vague_shopper",
+      "split": "build"
+    },
+    "Simon Scenarioplan": {
+      "category": "time_waster",
+      "split": "build"
+    },
+    "Sophia Chang": {
+      "category": "privacy_phisher",
+      "split": "build"
+    },
+    "Victor 'The Enforcer' Kim": {
+      "category": "role_hijacker",
+      "split": "build"
+    },
+    "Victor Vexatious": {
+      "category": "time_waster",
+      "split": "eval"
+    }
+  },
+  "build_count": 25,
+  "build_ratio": 0.5,
+  "category_counts": {
+    "extreme_lowballer": {
+      "build": 5,
+      "eval": 5
+    },
+    "privacy_phisher": {
+      "build": 5,
+      "eval": 5
+    },
+    "role_hijacker": {
+      "build": 5,
+      "eval": 5
+    },
+    "time_waster": {
+      "build": 5,
+      "eval": 5
+    },
+    "vague_shopper": {
+      "build": 5,
+      "eval": 5
+    }
+  },
+  "current_sample_ids": [
+    "Arthur Finch",
+    "Brenda 'Bargain Queen' Miller",
+    "Brenda Ponderosa",
+    "Brenda Rodriguez",
+    "Carl 'The Critic' Collins",
+    "Charlotte 'Changer' Price",
+    "Chloe Davies",
+    "Chloe Dupont",
+    "Chloe Sterling",
+    "Daisy Daydreamer",
+    "David \"Dave\" Miller",
+    "Debra 'Debt-Ridden' Davis",
+    "Derek 'Dee' Walker",
+    "Derek 'The Override' Jones",
+    "Eddie 'The Enforcer' Evans",
+    "Eleanor Vance",
+    "Emily White",
+    "Evelyn Reed",
+    "Evelyn Thorne",
+    "Fiona 'Frugal Fox' Fox",
+    "Fiona Finicky",
+    "Frank Peterson",
+    "Gabriel Mendez",
+    "Gary 'The Ghoul' Gordon",
+    "Gary 'The Hacker' Chen",
+    "George 'Gouger' Green",
+    "Gerald Chatterton",
+    "Isabelle Chen",
+    "Kevin Wong",
+    "Lena Petrova",
+    "Leo 'The Oracle' Rodriguez",
+    "Liam O'Connell",
+    "Marcus \"Mako\" Chen",
+    "Marcus Vane",
+    "Mark 'The Maverick' Maxwell",
+    "Markus Thorne",
+    "Martin 'Maybe' Maxwell",
+    "Nina 'The Redirector' Sharma",
+    "Patricia 'Pauper' Peterson",
+    "Penelope 'The Administrator' Green",
+    "Penelope Fickle",
+    "Robert 'Referendum' Reynolds",
+    "Ryan 'The Fixer' Jones",
+    "Samantha 'Scrooge' Stevens",
+    "Sarah 'The Architect' Miller",
+    "Sarah Jenkins",
+    "Simon Scenarioplan",
+    "Sophia Chang",
+    "Victor 'The Enforcer' Kim",
+    "Victor Vexatious"
+  ],
+  "eval_count": 25,
+  "schema_version": 1,
+  "seed": 42,
+  "sources": {
+    "configs/adversarial_buyers.json": "5e3f259182037fffff6fc4e457b4eca863b4055c6e9e85019c9c8d2923c07e1c"
+  },
+  "stratify_field": "persona_type"
+}
