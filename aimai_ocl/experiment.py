@@ -52,6 +52,7 @@ class ArmConfig:
 
     name: str
     ocl: bool = False
+    use_constraint_bank: bool = False
     baseline_mode: str | None = None
     coordinator_mode: str = "default"
     risk_rewrite_threshold: float = 0.45
@@ -79,6 +80,11 @@ ARMS: dict[str, ArmConfig] = {
         name="reference_monitor", ocl=False, baseline_mode="reference_monitor",
     ),
     "ocl_full": ArmConfig(name="ocl_full", ocl=True),
+    "ocl_v2": ArmConfig(
+    name="ocl_v2",
+    ocl=True,
+    use_constraint_bank=True,
+),
     "ocl_strict": ArmConfig(
         name="ocl_strict", ocl=True,
         risk_rewrite_threshold=0.35, risk_block_threshold=0.60,
