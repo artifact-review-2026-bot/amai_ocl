@@ -1,0 +1,13 @@
+mode: benchmark
+dataset: configs/constraint_bank_eval.json
+
+provider: dashscope
+model: qwen-plus
+api_key_env: DASHSCOPE_API_KEY
+
+constraint_bank_path: artifacts/constraint_bank_v1/constraint_bank.json
+
+arms:
+  - single
+  - ocl_full
+  - ocl_v2
