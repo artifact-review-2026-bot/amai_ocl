@@ -74,7 +74,13 @@ def validate_candidate(
 
     evidence_rounds = tuple(dict.fromkeys(feedback.evidence_rounds))
 
-    if len(evidence_rounds) < min_evidence_rounds:
+    required_evidence = (
+        1
+        if feedback.evaluation == "successful_recovery"
+        else min_evidence_rounds
+    )
+
+    if len(evidence_rounds) < required_evidence:
         return False, "insufficient_evidence"
 
     return True, "validated"

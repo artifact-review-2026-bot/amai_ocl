@@ -117,7 +117,7 @@ def retrieve_constraints(
                 )
 
         if (
-            constraint.category == "boundary"
+            constraint.category in {"boundary", "recovery"}
             and not matched_hard_ids
         ):
             continue

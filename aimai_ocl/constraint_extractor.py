@@ -56,11 +56,17 @@ def extract_candidate_constraints(
     """
     Extract contextual candidate constraints from structured trajectories.
 
-    This first version focuses on repeated hard-constraint triggers.
+    Two deterministic feedback patterns are currently supported:
 
-    The learned constraint must not duplicate the hard constraint itself.
-    Instead, it captures how the agent should behave after the same
-    execution boundary has already been enforced repeatedly.
+    1. Repeated boundary failure:
+       the same hard constraint is triggered repeatedly.
+
+    2. Successful recovery:
+       a hard constraint is triggered once, is not triggered again,
+       and the episode ultimately succeeds.
+
+    Learned constraints describe contextual handling strategies rather
+    than duplicating the underlying hard constraint itself.
     """
 
     if min_repeats < 2:
@@ -71,7 +77,9 @@ def extract_candidate_constraints(
     for step in trajectory:
         round_id = int(step.get("round_id", -1))
 
-        for constraint_id in step.get("failed_hard_constraints") or []:
+        for constraint_id in step.get(
+            "failed_hard_constraints"
+        ) or []:
             constraint_id = str(constraint_id)
 
             rounds_by_constraint.setdefault(
@@ -79,10 +87,13 @@ def extract_candidate_constraints(
                 [],
             ).append(round_id)
 
-    status = final_status or _infer_final_status(trajectory)
+    status = final_status or _infer_final_status(
+        trajectory
+    )
 
     results: list[ExtractionResult] = []
 
+    # Pattern 1: repeated boundary failure.
     for constraint_id, evidence_rounds in sorted(
         rounds_by_constraint.items()
     ):
@@ -139,5 +150,60 @@ def extract_candidate_constraints(
                 candidate=candidate,
             )
         )
+
+    # Pattern 2: successful recovery after one intervention.
+    if status == "agreed":
+        for constraint_id, evidence_rounds in sorted(
+            rounds_by_constraint.items()
+        ):
+            if len(evidence_rounds) != 1:
+                continue
+
+            trigger_round = evidence_rounds[0]
+
+            directive = (
+                "Continue from the corrected safe action after the "
+                "hard intervention succeeds. Do not revert to the "
+                "previously blocked behavior."
+            )
+
+            when = (
+                f"When hard constraint '{constraint_id}' has been "
+                "triggered once, the behavior has been corrected, "
+                "and negotiation continues."
+            )
+
+            rule = (
+                "Preserve the corrected safe behavior after the "
+                "intervention and continue toward agreement without "
+                "returning to the previously blocked action."
+            )
+
+            category = "recovery"
+
+            candidate = Constraint(
+                id=_stable_constraint_id(
+                    category=category,
+                    rule=rule,
+                    when=when,
+                ),
+                category=category,
+                rule=rule,
+                when=when,
+            )
+
+            feedback = FeedbackSignal(
+                evaluation="successful_recovery",
+                directive=directive,
+                source_hard_constraint=constraint_id,
+                evidence_rounds=(trigger_round,),
+            )
+
+            results.append(
+                ExtractionResult(
+                    feedback=feedback,
+                    candidate=candidate,
+                )
+            )
 
     return results

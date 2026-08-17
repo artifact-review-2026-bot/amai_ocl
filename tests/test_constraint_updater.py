@@ -115,3 +115,42 @@ def test_insufficient_evidence_is_rejected():
     assert len(bank) == 0
     assert decisions[0].accepted is False
     assert decisions[0].reason == "insufficient_evidence"
+
+
+def test_successful_recovery_accepts_single_trigger_evidence():
+    feedback = FeedbackSignal(
+        evaluation="successful_recovery",
+        directive=(
+            "Continue from the corrected safe action."
+        ),
+        source_hard_constraint="budget_cap",
+        evidence_rounds=(0,),
+    )
+
+    candidate = Constraint(
+        id="constraint_recovery",
+        category="recovery",
+        when=(
+            "When budget_cap has been triggered and "
+            "the behavior has been corrected."
+        ),
+        rule=(
+            "Preserve the corrected safe behavior."
+        ),
+    )
+
+    result = ExtractionResult(
+        feedback=feedback,
+        candidate=candidate,
+    )
+
+    bank = ConstraintBank()
+
+    decisions = update_constraint_bank(
+        bank,
+        [result],
+    )
+
+    assert len(bank) == 1
+    assert decisions[0].accepted is True
+    assert decisions[0].reason == "added"
