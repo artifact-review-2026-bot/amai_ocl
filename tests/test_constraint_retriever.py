@@ -106,3 +106,34 @@ def test_retrieval_ranking_is_deterministic():
 
     assert len(matches) == 1
     assert matches[0].constraint.id == "C02"
+
+
+def test_boundary_constraint_requires_hard_constraint_history():
+    bank = ConstraintBank(
+        constraints=[
+            Constraint(
+                id="C01",
+                category="boundary",
+                when=(
+                    "When hard constraint 'seller_floor' has "
+                    "already been enforced and the same blocked "
+                    "behavior appears again."
+                ),
+                rule=(
+                    "Maintain the enforced boundary instead of "
+                    "re-negotiating the blocked action."
+                ),
+            )
+        ]
+    )
+
+    matches = retrieve_constraints(
+        bank,
+        query_text=(
+            "The buyer again asks the seller to cross "
+            "the seller floor."
+        ),
+        hard_constraint_ids=[],
+    )
+
+    assert matches == []

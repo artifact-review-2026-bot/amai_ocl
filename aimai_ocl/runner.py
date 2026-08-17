@@ -56,6 +56,8 @@ def run_episode(
     coordinator: Coordinator | None = None,
     audit_policy: AuditPolicy | None = None,
     enable_replan: bool = True,
+    use_constraint_bank: bool = False,
+    constraint_bank: Any | None = None,
     baseline_mode: str | None = None,
     seller_context_mode: str = "enriched",
     agentspec_adapter: Any | None = None,
@@ -77,6 +79,11 @@ def run_episode(
     observation, _ = adapter.reset(**normalized_reset)
     trace = adapter.new_trace(scenario=normalized_reset, metadata=trace_metadata)
     trajectory = trace.metadata.setdefault("trajectory", [])
+
+    if use_constraint_bank and constraint_bank is None:
+        raise RuntimeError(
+            "use_constraint_bank=True requires a ConstraintBank."
+        )
 
     coord = coordinator or Coordinator()
     policy = audit_policy
@@ -133,6 +140,44 @@ def run_episode(
         seller_actor_id = getattr(seller_agent, "name", "seller")
         event_start = len(trace.events)
 
+        retrieved_constraints: list[dict[str, Any]] = []
+
+        if use_constraint_bank:
+            from aimai_ocl.constraint_retriever import (
+                retrieve_constraints,
+            )
+
+            previous_failed_hard_constraints = [
+                constraint_id
+                for previous_step in trajectory
+                for constraint_id in (
+                    previous_step.get(
+                        "failed_hard_constraints"
+                    ) or []
+                )
+            ]
+
+            matches = retrieve_constraints(
+                constraint_bank,
+                query_text=buyer_text or "",
+                hard_constraint_ids=(
+                    previous_failed_hard_constraints
+                ),
+                top_k=3,
+            )
+
+            retrieved_constraints = [
+                {
+                    "id": match.constraint.id,
+                    "category": match.constraint.category,
+                    "when": match.constraint.when,
+                    "rule": match.constraint.rule,
+                    "score": match.score,
+                    "reasons": list(match.reasons),
+                }
+                for match in matches
+            ]
+
         if ocl:
             # Coordination: who owns this round?
             plan = coord.plan_turn(
@@ -153,6 +198,58 @@ def run_episode(
                 if seller_context_mode == "observation_only"
                 else seller_state
             )
+
+            if use_constraint_bank:
+                seller_generation_state = dict(
+                    seller_generation_state
+                )
+
+                seller_generation_state[
+                    "learned_constraints"
+                ] = [
+                    {
+                        "id": item["id"],
+                        "category": item["category"],
+                        "when": item["when"],
+                        "rule": item["rule"],
+                    }
+                    for item in retrieved_constraints
+                ]
+
+                if retrieved_constraints:
+                    learned_lines = [
+                        (
+                            "Learned constraints for this turn. "
+                            "Use them as contextual guidance only. "
+                            "Hard constraints and platform control "
+                            "decisions remain authoritative."
+                        )
+                    ]
+
+                    for item in retrieved_constraints:
+                        learned_lines.append(
+                            f"- When: {item['when']}\n"
+                            f"  Rule: {item['rule']}"
+                        )
+
+                    learned_instruction = "\n".join(
+                        learned_lines
+                    )
+
+                    existing_instruction = str(
+                        seller_generation_state.get(
+                            "instruction",
+                            "",
+                        )
+                        or ""
+                    ).strip()
+
+                    seller_generation_state["instruction"] = (
+                        existing_instruction
+                        + ("\n\n" if existing_instruction else "")
+                        + learned_instruction
+                    )
+
             seller_action = seller_agent.respond(
                 conversation_history=seller_history,
                 current_state=seller_generation_state,
@@ -356,7 +453,8 @@ def run_episode(
                 "seller_executed": seller_text,
                 "hard_decisions": hard_decisions,
                 "failed_hard_constraints": failed_hard_constraints,
-                "next_buyer_message": None,
+                "retrieved_constraints": retrieved_constraints,
+            "next_buyer_message": None,
                 "next_state": {
                     "terminated": bool(terminated),
                     "truncated": bool(truncated),

@@ -110,6 +110,9 @@ def _to_run_config(values: dict[str, Any]) -> RunConfig:
         product_name=_get("product_name", str, "Winter Jacket"),
         product_price=_get("product_price", float, 180.0),
         user_profile=_get("user_profile", str, "Budget-conscious and compares options before buying."),
+        constraint_bank_path=_get(
+            "constraint_bank_path", str, None
+        ),
         toolguard_generated_guard_dir=_get(
             "toolguard_generated_guard_dir", str, None
         ),

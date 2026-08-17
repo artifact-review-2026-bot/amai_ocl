@@ -36,6 +36,7 @@ class RunConfig:
     product_name: str = "Winter Jacket"
     product_price: float = 180.0
     user_profile: str = "Budget-conscious and compares options before buying."
+    constraint_bank_path: str | None = None
 
     # ToolGuard-Commerce runtime configuration.
     toolguard_generated_guard_dir: str | None = None

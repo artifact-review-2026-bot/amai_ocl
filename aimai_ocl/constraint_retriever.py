@@ -106,12 +106,21 @@ def retrieve_constraints(
         score = 0
         reasons: list[str] = []
 
+        matched_hard_ids: list[str] = []
+
         for hard_id in sorted(normalized_hard_ids):
             if hard_id in searchable_text:
                 score += 5
+                matched_hard_ids.append(hard_id)
                 reasons.append(
                     f"hard_constraint:{hard_id}"
                 )
+
+        if (
+            constraint.category == "boundary"
+            and not matched_hard_ids
+        ):
+            continue
 
         overlap = sorted(
             query_tokens & searchable_tokens

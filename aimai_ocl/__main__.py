@@ -540,6 +540,20 @@ def _run_one_episode(
             arm=arm.name,
             episode_key=f"{arm.name}-seed-{run_config.seed}",
         )
+    constraint_bank = None
+
+    if arm.use_constraint_bank:
+        if not run_config.constraint_bank_path:
+            raise RuntimeError(
+                "ocl_v2 requires constraint_bank_path."
+            )
+
+        from aimai_ocl.constraint_bank import ConstraintBank
+
+        constraint_bank = ConstraintBank.load_json(
+            run_config.constraint_bank_path
+        )
+
     return run_episode(
         env_id=run_config.env_id,
         buyer_agent=buyer,
@@ -561,6 +575,8 @@ def _run_one_episode(
         coordinator=Coordinator(mode=arm.coordinator_mode) if arm.ocl else None,
         audit_policy=audit,
         enable_replan=arm.enable_replan,
+        use_constraint_bank=arm.use_constraint_bank,
+        constraint_bank=constraint_bank,
         baseline_mode=arm.baseline_mode,
         seller_context_mode=arm.seller_context_mode,
         agentspec_adapter=agentspec_adapter,
