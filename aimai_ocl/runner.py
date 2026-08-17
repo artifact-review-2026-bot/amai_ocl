@@ -63,6 +63,7 @@ def run_episode(
     agentspec_adapter: Any | None = None,
     toolguard_adapter: Any | None = None,
     toolguard_buyer_max_price_visibility: str | None = None,
+    initial_buyer_message: str | None = None,
 ) -> tuple[EpisodeTrace, dict[str, Any]]:
     """Run one negotiation episode.
 
@@ -124,11 +125,16 @@ def run_episode(
         agentspec_round_record: dict[str, Any] | None = None
         toolguard_proposal_id: str | None = None
         # --- Buyer turn (always passthrough) ---
-        buyer_action = buyer_agent.respond(
-            conversation_history=observation["conversation_history"],
-            current_state=observation,
-        )
-        buyer_text = _normalize(buyer_action if isinstance(buyer_action, str) else None)
+        if round_id == 0 and initial_buyer_message is not None:
+            buyer_text = _normalize(initial_buyer_message)
+        else:
+            buyer_action = buyer_agent.respond(
+                conversation_history=observation["conversation_history"],
+                current_state=observation,
+            )
+            buyer_text = _normalize(
+                buyer_action if isinstance(buyer_action, str) else None
+            )
         if trajectory:
             trajectory[-1]["next_buyer_message"] = buyer_text
 

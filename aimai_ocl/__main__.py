@@ -268,6 +268,8 @@ def _run_benchmark(run_config: RunConfig, exp: dict, args: argparse.Namespace) -
         persona_type = profile.get("persona_type", "unknown")
         print(f"\n=== Profile {actual_i+1} (Offset {offset}): [{persona_type}] {profile.get('name')} ===")
 
+        shared_initial_buyer_message: str | None = None
+
         for arm_name in arm_names:
             arm = _resolve_arm(arm_name, exp)
             seed = seed_base + actual_i
@@ -278,8 +280,32 @@ def _run_benchmark(run_config: RunConfig, exp: dict, args: argparse.Namespace) -
             rc = RunConfig(**rc_kwargs)
 
             t0 = time.time()
-            trace, info = _run_one_episode(rc, arm)
+            trace, info = _run_one_episode(
+                rc,
+                arm,
+                initial_buyer_message=shared_initial_buyer_message,
+            )
             elapsed = time.time() - t0
+
+            if shared_initial_buyer_message is None:
+                trajectory = trace.metadata.get("trajectory", [])
+
+                if not trajectory:
+                    raise RuntimeError(
+                        "Cannot capture shared buyer opening: "
+                        "trajectory is empty."
+                    )
+
+                shared_initial_buyer_message = trajectory[0].get(
+                    "buyer_message"
+                )
+
+                if not shared_initial_buyer_message:
+                    raise RuntimeError(
+                        "Cannot capture shared buyer opening: "
+                        "first buyer message is empty."
+                    )
+
             success = success_from_status(info.get("status"))
             vs = collect_violation_stats(trace)
             agentspec_stats = collect_agentspec_stats(trace)
@@ -489,6 +515,7 @@ def _run_shapley(run_config: RunConfig, exp: dict, args: argparse.Namespace) -> 
 def _run_one_episode(
     run_config: RunConfig,
     arm: ArmConfig,
+    initial_buyer_message: str | None = None,
 ) -> tuple[Any, dict[str, Any]]:
     """Build agents, configure control, and run one episode."""
     buyer, seller = build_agents(
@@ -584,6 +611,7 @@ def _run_one_episode(
         toolguard_buyer_max_price_visibility=(
             run_config.toolguard_buyer_max_price_visibility
         ),
+        initial_buyer_message=initial_buyer_message,
     )
 
 
