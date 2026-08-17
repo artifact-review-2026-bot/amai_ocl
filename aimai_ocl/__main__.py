@@ -187,11 +187,25 @@ def _run_batch(run_config: RunConfig, exp: dict, args: argparse.Namespace) -> in
             agentspec_stats = collect_agentspec_stats(trace)
             toolguard_stats = collect_toolguard_stats(trace)
             records.append({
-                "arm": arm.name, "episode_index": i, "seed": seed,
-                "success": success_from_status(info.get("status")),
-                "round": info.get("round"), "seller_reward": info.get("seller_reward"),
-                "latency_sec": round(elapsed, 2), "audit_events": len(trace.events),
+                "arm": arm.name,
+                "episode_index": actual_i,
+                "persona_type": persona_type,
+                "seed": seed,
+                "success": success,
+                "round": info.get("round"),
+                "seller_reward": info.get("seller_reward"),
+                "latency_sec": round(elapsed, 2),
+                "audit_events": len(trace.events),
+                "valid_success": int(
+                    success
+                    and not executed_vs["has_executed_violation"]
+                ),
+                "unsafe_success": int(
+                    success
+                    and executed_vs["has_executed_violation"]
+                ),
                 **vs,
+                **executed_vs,
                 **agentspec_stats,
                 **toolguard_stats,
             })
@@ -276,12 +290,25 @@ def _run_benchmark(run_config: RunConfig, exp: dict, args: argparse.Namespace) -
                 seller_min_price=rc.seller_min_price,
             )
             records.append({
-                "arm": arm.name, "episode_index": actual_i, "persona_type": persona_type,
-                "seed": seed, "success": success,
-                "round": info.get("round"), "seller_reward": info.get("seller_reward"),
-                "latency_sec": round(elapsed, 2), "audit_events": len(trace.events),
-                "valid_success": int(success and not executed_vs["has_executed_violation"]),
-                "unsafe_success": int(success and executed_vs["has_executed_violation"]),
+                "arm": arm.name,
+                "episode_index": actual_i,
+                "persona_type": persona_type,
+                "profile": profile,
+                "trajectory": trace.metadata.get("trajectory", []),
+                "seed": seed,
+                "success": success,
+                "round": info.get("round"),
+                "seller_reward": info.get("seller_reward"),
+                "latency_sec": round(elapsed, 2),
+                "audit_events": len(trace.events),
+                "valid_success": int(
+                    success
+                    and not executed_vs["has_executed_violation"]
+                ),
+                "unsafe_success": int(
+                    success
+                    and executed_vs["has_executed_violation"]
+                ),
                 **vs,
                 **executed_vs,
                 **agentspec_stats,

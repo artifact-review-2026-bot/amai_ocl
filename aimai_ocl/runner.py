@@ -76,6 +76,7 @@ def run_episode(
     adapter = EnvAdapter(env_id=env_id, env_kwargs=env_config)
     observation, _ = adapter.reset(**normalized_reset)
     trace = adapter.new_trace(scenario=normalized_reset, metadata=trace_metadata)
+    trajectory = trace.metadata.setdefault("trajectory", [])
 
     coord = coordinator or Coordinator()
     policy = audit_policy
@@ -121,6 +122,8 @@ def run_episode(
             current_state=observation,
         )
         buyer_text = _normalize(buyer_action if isinstance(buyer_action, str) else None)
+        if trajectory:
+            trajectory[-1]["next_buyer_message"] = buyer_text
 
         # --- Seller turn ---
         seller_history = observation["conversation_history"].copy()
@@ -128,6 +131,7 @@ def run_episode(
             seller_history.append({"role": "buyer", "content": buyer_text, "round": round_id})
 
         seller_actor_id = getattr(seller_agent, "name", "seller")
+        event_start = len(trace.events)
 
         if ocl:
             # Coordination: who owns this round?
@@ -288,6 +292,37 @@ def run_episode(
                     round_id=round_id,
                     audit_policy=policy,
                 )
+        seller_proposal = _normalize(
+            seller_action if isinstance(seller_action, str) else None
+        )
+
+        round_events = trace.events[event_start:]
+
+        hard_decisions: list[str] = []
+        failed_hard_constraints: list[str] = []
+
+        for event in round_events:
+            if event.actor_id != seller_actor_id:
+                continue
+
+            if (
+                event.event_type == AuditEventType.CONSTRAINT_EVALUATED
+                and event.executable_action is not None
+            ):
+                hard_decisions.append(
+                    event.executable_action.decision.value
+                )
+
+                for check in event.constraint_checks:
+                    if not check.passed:
+                        failed_hard_constraints.append(
+                            check.constraint_id
+                        )
+
+        hard_decisions = list(dict.fromkeys(hard_decisions))
+        failed_hard_constraints = list(
+            dict.fromkeys(failed_hard_constraints)
+        )
 
         if seller_text is not None:
             executed_record: dict[str, Any] = {
@@ -304,13 +339,36 @@ def run_episode(
             if toolguard_proposal_id is not None:
                 executed_record["proposal_id"] = toolguard_proposal_id
 
-            trace.metadata.setdefault("executed_seller_actions", []).append(
-                executed_record
-            )
+            trace.metadata.setdefault(
+                "executed_seller_actions", []
+            ).append(executed_record)
 
         observation, _, terminated, truncated, final_info = adapter.step(
             buyer_action=buyer_text,
             seller_action=seller_text,
+        )
+
+        trajectory.append(
+            {
+                "round_id": round_id,
+                "buyer_message": buyer_text,
+                "seller_proposal": seller_proposal,
+                "seller_executed": seller_text,
+                "hard_decisions": hard_decisions,
+                "failed_hard_constraints": failed_hard_constraints,
+                "next_buyer_message": None,
+                "next_state": {
+                    "terminated": bool(terminated),
+                    "truncated": bool(truncated),
+                    "status": final_info.get("status"),
+                    "termination_reason": final_info.get(
+                        "termination_reason"
+                    ),
+                    "agreed_price": final_info.get("agreed_price"),
+                    "buyer_reward": final_info.get("buyer_reward"),
+                    "seller_reward": final_info.get("seller_reward"),
+                },
+            }
         )
 
         if agentspec_round_record is not None:

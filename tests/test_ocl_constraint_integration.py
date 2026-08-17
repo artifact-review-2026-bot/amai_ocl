@@ -145,7 +145,48 @@ class OCLConstraintIntegrationTests(unittest.TestCase):
             and event.actor_id == "seller"
         ]
         self.assertGreater(len(replan_events), 0)
+        trajectory = trace.metadata["trajectory"]
 
+        self.assertEqual(1, len(trajectory))
+
+        round_record = trajectory[0]
+
+        self.assertEqual(
+            "offer $100",
+            round_record["buyer_message"],
+        )
+        self.assertEqual(
+            "final offer $130",
+            round_record["seller_proposal"],
+        )
+        self.assertEqual(
+            "I can revise to $120.00.",
+            round_record["seller_executed"],
+        )
+
+        self.assertIn(
+            "budget_cap",
+            round_record["failed_hard_constraints"],
+        )
+
+        self.assertIsNone(
+            round_record["next_buyer_message"]
+        )
+
+        self.assertEqual(
+            "agreed",
+            round_record["next_state"]["status"],
+        )
+        self.assertTrue(
+            round_record["next_state"]["terminated"]
+        )
+        self.assertFalse(
+            round_record["next_state"]["truncated"]
+        )
+        self.assertEqual(
+            100.0,
+            round_record["next_state"]["agreed_price"],
+        )
 
 if __name__ == "__main__":
     unittest.main()
