@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "bank_version": "v1",
+  "input_file": "outputs/constraint_bank_build_full/benchmark_results.json",
+  "input_sha256": "a4ecada55b125ed0908493d62037f9599afc210aafd8bcb8cbc98cd33e815adf",
+  "min_evidence_rounds": 2,
+  "record_count": 25,
+  "trajectory_record_count": 25,
+  "candidate_count": 19,
+  "accepted_count": 4,
+  "rejected_count": 15,
+  "rejection_reasons": {
+    "duplicate_id": 15
+  },
+  "bank_size": 4
+}
