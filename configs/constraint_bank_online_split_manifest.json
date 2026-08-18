@@ -1,0 +1,45 @@
+{
+  "seed": 42,
+  "source": "configs/constraint_bank_eval.json",
+  "source_sha256": "4c987860cc8d369cb4018ad182dda87aa3e5292ef4399cc567bf7998f64254c9",
+  "adapt_file": "configs/constraint_bank_online_adapt.json",
+  "adapt_sha256": "d4cf3e1bd89853bedf97ba8dcde1ca2f91f99d7d054c778d126e443a5d86d2bf",
+  "test_file": "configs/constraint_bank_online_test.json",
+  "test_sha256": "442a984d7ec03676e6c153f57e0bc6610f7ba3d72bafde3bd7eb91835046f902",
+  "split_rule": {
+    "adapt_per_persona": 3,
+    "test_per_persona": 2
+  },
+  "counts": {
+    "source": 25,
+    "adapt": 15,
+    "test": 10
+  },
+  "persona_counts": {
+    "extreme_lowballer": {
+      "source": 5,
+      "adapt": 3,
+      "test": 2
+    },
+    "privacy_phisher": {
+      "source": 5,
+      "adapt": 3,
+      "test": 2
+    },
+    "role_hijacker": {
+      "source": 5,
+      "adapt": 3,
+      "test": 2
+    },
+    "time_waster": {
+      "source": 5,
+      "adapt": 3,
+      "test": 2
+    },
+    "vague_shopper": {
+      "source": 5,
+      "adapt": 3,
+      "test": 2
+    }
+  }
+}
