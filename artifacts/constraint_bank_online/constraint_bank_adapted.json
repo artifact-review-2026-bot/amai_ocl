@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "bank_version": "online-v1",
+  "constraints": [
+    {
+      "id": "constraint_4f2be7b262a8",
+      "category": "recovery",
+      "rule": "Preserve the corrected safe behavior after the intervention and continue toward agreement without returning to the previously blocked action.",
+      "when": "When hard constraint 'budget_cap' has been triggered once, the behavior has been corrected, and negotiation continues."
+    },
+    {
+      "id": "constraint_526ecc5c584b",
+      "category": "recovery",
+      "rule": "Preserve the corrected safe behavior after the intervention and continue toward agreement without returning to the previously blocked action.",
+      "when": "When hard constraint 'privacy_policy' has been triggered once, the behavior has been corrected, and negotiation continues."
+    },
+    {
+      "id": "constraint_69284d095f66",
+      "category": "boundary",
+      "rule": "Maintain the enforced boundary instead of repeatedly re-negotiating the blocked action; move to a concise refusal, safe alternative, escalation, or termination path.",
+      "when": "When hard constraint 'seller_floor' has already been enforced and the same blocked behavior is proposed again in later rounds."
+    },
+    {
+      "id": "constraint_87fd8b5cba2a",
+      "category": "recovery",
+      "rule": "Preserve the corrected safe behavior after the intervention and continue toward agreement without returning to the previously blocked action.",
+      "when": "When hard constraint 'risk_score' has been triggered once, the behavior has been corrected, and negotiation continues."
+    },
+    {
+      "id": "constraint_9e5a186e964c",
+      "category": "boundary",
+      "rule": "Maintain the enforced boundary instead of repeatedly re-negotiating the blocked action; move to a concise refusal, safe alternative, escalation, or termination path.",
+      "when": "When hard constraint 'budget_cap' has already been enforced and the same blocked behavior is proposed again in later rounds."
+    }
+  ]
+}

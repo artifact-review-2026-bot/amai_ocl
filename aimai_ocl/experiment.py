@@ -38,6 +38,7 @@ class RunConfig:
     user_profile: str = "Budget-conscious and compares options before buying."
     constraint_bank_path: str | None = None
     online_constraint_bank_path: str | None = None
+    adapted_constraint_bank_path: str | None = None
 
     # ToolGuard-Commerce runtime configuration.
     toolguard_generated_guard_dir: str | None = None
@@ -56,6 +57,7 @@ class ArmConfig:
     ocl: bool = False
     use_constraint_bank: bool = False
     online_constraint_update: bool = False
+    use_adapted_constraint_bank: bool = False
     baseline_mode: str | None = None
     coordinator_mode: str = "default"
     risk_rewrite_threshold: float = 0.45
@@ -93,6 +95,12 @@ ARMS: dict[str, ArmConfig] = {
         ocl=True,
         use_constraint_bank=True,
         online_constraint_update=True,
+    ),
+    "ocl_v2_adapted": ArmConfig(
+        name="ocl_v2_adapted",
+        ocl=True,
+        use_constraint_bank=True,
+        use_adapted_constraint_bank=True,
     ),
     "ocl_strict": ArmConfig(
         name="ocl_strict", ocl=True,

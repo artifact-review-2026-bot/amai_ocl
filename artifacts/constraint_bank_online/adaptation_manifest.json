@@ -1,0 +1,9 @@
+{
+  "adaptation_episodes": 15,
+  "initial_bank_size": 4,
+  "adapted_bank_size": 5,
+  "initial_bank_sha256": "cb9f8648fb794d6133e158b25d97d41f7ccf4e152608734c9f749085eac4530c",
+  "adapted_bank_sha256": "679a3ee0decd42a61d464e06c17b7bc563a974e581cc295b482b1171e5670851",
+  "adaptation_data_sha256": "d4cf3e1bd89853bedf97ba8dcde1ca2f91f99d7d054c778d126e443a5d86d2bf",
+  "adaptation_results_sha256": "b0e4831a6303eee2c68292c8f7911dfe73b97ea1d42f50cc057637ea80cc4644"
+}

@@ -602,18 +602,17 @@ def _run_one_episode(
     constraint_bank = None
 
     if arm.use_constraint_bank:
-        bank_path = (
-            run_config.online_constraint_bank_path
-            if arm.online_constraint_update
-            else run_config.constraint_bank_path
-        )
+        if arm.online_constraint_update:
+            bank_path = run_config.online_constraint_bank_path
+            required_field = "online_constraint_bank_path"
+        elif arm.use_adapted_constraint_bank:
+            bank_path = run_config.adapted_constraint_bank_path
+            required_field = "adapted_constraint_bank_path"
+        else:
+            bank_path = run_config.constraint_bank_path
+            required_field = "constraint_bank_path"
 
         if not bank_path:
-            required_field = (
-                "online_constraint_bank_path"
-                if arm.online_constraint_update
-                else "constraint_bank_path"
-            )
             raise RuntimeError(
                 f"{arm.name} requires {required_field}."
             )

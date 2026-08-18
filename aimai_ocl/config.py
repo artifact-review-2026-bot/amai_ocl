@@ -116,6 +116,9 @@ def _to_run_config(values: dict[str, Any]) -> RunConfig:
         online_constraint_bank_path=_get(
             "online_constraint_bank_path", str, None
         ),
+        adapted_constraint_bank_path=_get(
+            "adapted_constraint_bank_path", str, None
+        ),
         toolguard_generated_guard_dir=_get(
             "toolguard_generated_guard_dir", str, None
         ),
