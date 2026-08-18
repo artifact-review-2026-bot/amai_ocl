@@ -315,12 +315,44 @@ def _run_benchmark(run_config: RunConfig, exp: dict, args: argparse.Namespace) -
                 buyer_max_price=rc.buyer_max_price,
                 seller_min_price=rc.seller_min_price,
             )
+
+            online_update_stats = None
+
+            if arm.online_constraint_update:
+                if not rc.online_constraint_bank_path:
+                    raise RuntimeError(
+                        f"{arm.name} requires "
+                        "online_constraint_bank_path."
+                    )
+
+                from aimai_ocl.constraint_online import (
+                    update_online_constraint_bank,
+                )
+
+                online_update_stats = update_online_constraint_bank(
+                    rc.online_constraint_bank_path,
+                    trace.metadata.get("trajectory", []),
+                )
+
+                print(
+                    "    [online update] "
+                    f"candidates="
+                    f"{online_update_stats['candidate_count']}, "
+                    f"accepted="
+                    f"{online_update_stats['accepted_count']}, "
+                    f"bank="
+                    f"{online_update_stats['bank_size_before']}"
+                    "->"
+                    f"{online_update_stats['bank_size_after']}"
+                )
+
             records.append({
                 "arm": arm.name,
                 "episode_index": actual_i,
                 "persona_type": persona_type,
                 "profile": profile,
                 "trajectory": trace.metadata.get("trajectory", []),
+                "online_constraint_update": online_update_stats,
                 "seed": seed,
                 "success": success,
                 "round": info.get("round"),
@@ -570,15 +602,26 @@ def _run_one_episode(
     constraint_bank = None
 
     if arm.use_constraint_bank:
-        if not run_config.constraint_bank_path:
+        bank_path = (
+            run_config.online_constraint_bank_path
+            if arm.online_constraint_update
+            else run_config.constraint_bank_path
+        )
+
+        if not bank_path:
+            required_field = (
+                "online_constraint_bank_path"
+                if arm.online_constraint_update
+                else "constraint_bank_path"
+            )
             raise RuntimeError(
-                "ocl_v2 requires constraint_bank_path."
+                f"{arm.name} requires {required_field}."
             )
 
         from aimai_ocl.constraint_bank import ConstraintBank
 
         constraint_bank = ConstraintBank.load_json(
-            run_config.constraint_bank_path
+            bank_path
         )
 
     return run_episode(
