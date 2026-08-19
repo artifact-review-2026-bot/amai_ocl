@@ -58,6 +58,7 @@ def run_episode(
     enable_replan: bool = True,
     use_constraint_bank: bool = False,
     constraint_bank: Any | None = None,
+    constraint_feedback_store: Any | None = None,
     baseline_mode: str | None = None,
     seller_context_mode: str = "enriched",
     agentspec_adapter: Any | None = None,
@@ -170,6 +171,7 @@ def run_episode(
                     previous_failed_hard_constraints
                 ),
                 top_k=3,
+                feedback_store=constraint_feedback_store,
             )
 
             retrieved_constraints = [

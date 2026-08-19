@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
-from typing import Iterable
+from typing import Any, Iterable
 
 from aimai_ocl.constraint_bank import Constraint, ConstraintBank
 
@@ -55,6 +55,62 @@ def _tokens(text: str) -> set[str]:
     }
 
 
+_FEEDBACK_MIN_EVALUATIONS = 3
+_FEEDBACK_POSITIVE_THRESHOLD = 0.67
+_FEEDBACK_NEGATIVE_THRESHOLD = 0.33
+_FEEDBACK_BOOST = 2
+_FEEDBACK_PENALTY = -2
+
+
+def _feedback_score_adjustment(
+    feedback_store: Any | None,
+    constraint_id: str,
+) -> tuple[int, str | None]:
+    """
+    Return a soft retrieval-score adjustment based on historical
+    episode-level effectiveness.
+
+    Feedback never determines relevance. It only adjusts the ranking
+    of constraints that already match the current context.
+    """
+
+    if feedback_store is None:
+        return 0, None
+
+    feedback_map = getattr(
+        feedback_store,
+        "feedback",
+        {},
+    )
+
+    feedback = feedback_map.get(constraint_id)
+
+    if feedback is None:
+        return 0, None
+
+    if feedback.evaluation_count < _FEEDBACK_MIN_EVALUATIONS:
+        return 0, None
+
+    effectiveness = feedback.effectiveness
+
+    if effectiveness is None:
+        return 0, None
+
+    if effectiveness >= _FEEDBACK_POSITIVE_THRESHOLD:
+        return (
+            _FEEDBACK_BOOST,
+            f"feedback:boost:{effectiveness:.3f}",
+        )
+
+    if effectiveness <= _FEEDBACK_NEGATIVE_THRESHOLD:
+        return (
+            _FEEDBACK_PENALTY,
+            f"feedback:penalty:{effectiveness:.3f}",
+        )
+
+    return 0, None
+
+
 def retrieve_constraints(
     bank: ConstraintBank,
     *,
@@ -62,6 +118,7 @@ def retrieve_constraints(
     hard_constraint_ids: Iterable[str] = (),
     top_k: int = 3,
     min_score: int = 1,
+    feedback_store: Any | None = None,
 ) -> list[ConstraintMatch]:
     """
     Retrieve relevant learned constraints deterministically.
@@ -136,14 +193,31 @@ def retrieve_constraints(
                 "text_overlap:" + ",".join(overlap)
             )
 
-        if score >= min_score:
-            matches.append(
-                ConstraintMatch(
-                    constraint=constraint,
-                    score=score,
-                    reasons=tuple(reasons),
-                )
+        # Relevance is determined before feedback is applied.
+        # Historical feedback may change ranking, but it must not make
+        # an otherwise irrelevant constraint eligible for retrieval.
+        if score < min_score:
+            continue
+
+        feedback_adjustment, feedback_reason = (
+            _feedback_score_adjustment(
+                feedback_store,
+                constraint.id,
             )
+        )
+
+        score += feedback_adjustment
+
+        if feedback_reason is not None:
+            reasons.append(feedback_reason)
+
+        matches.append(
+            ConstraintMatch(
+                constraint=constraint,
+                score=score,
+                reasons=tuple(reasons),
+            )
+        )
 
     matches.sort(
         key=lambda item: (

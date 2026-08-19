@@ -39,6 +39,7 @@ class RunConfig:
     constraint_bank_path: str | None = None
     online_constraint_bank_path: str | None = None
     adapted_constraint_bank_path: str | None = None
+    online_constraint_feedback_path: str | None = None
 
     # ToolGuard-Commerce runtime configuration.
     toolguard_generated_guard_dir: str | None = None

@@ -346,6 +346,43 @@ def _run_benchmark(run_config: RunConfig, exp: dict, args: argparse.Namespace) -
                     f"{online_update_stats['bank_size_after']}"
                 )
 
+            online_feedback_stats = None
+
+            if arm.online_constraint_update:
+                if not rc.online_constraint_feedback_path:
+                    raise RuntimeError(
+                        f"{arm.name} requires "
+                        "online_constraint_feedback_path."
+                    )
+
+                from aimai_ocl.constraint_feedback import (
+                    ConstraintFeedbackStore,
+                    update_feedback_from_trajectory,
+                )
+
+                feedback_store = (
+                    ConstraintFeedbackStore.load_json(
+                        rc.online_constraint_feedback_path
+                    )
+                )
+
+                online_feedback_stats = (
+                    update_feedback_from_trajectory(
+                        feedback_store,
+                        trace.metadata.get("trajectory", []),
+                    )
+                )
+
+                feedback_store.save_json(
+                    rc.online_constraint_feedback_path
+                )
+
+                print(
+                    "    [constraint feedback] "
+                    f"evaluated="
+                    f"{online_feedback_stats['evaluated_constraints']}"
+                )
+
             records.append({
                 "arm": arm.name,
                 "episode_index": actual_i,
@@ -353,6 +390,7 @@ def _run_benchmark(run_config: RunConfig, exp: dict, args: argparse.Namespace) -
                 "profile": profile,
                 "trajectory": trace.metadata.get("trajectory", []),
                 "online_constraint_update": online_update_stats,
+                "online_constraint_feedback": online_feedback_stats,
                 "seed": seed,
                 "success": success,
                 "round": info.get("round"),
@@ -623,6 +661,29 @@ def _run_one_episode(
             bank_path
         )
 
+    constraint_feedback_store = None
+
+    if arm.online_constraint_update:
+        feedback_path = (
+            run_config.online_constraint_feedback_path
+        )
+
+        if not feedback_path:
+            raise RuntimeError(
+                f"{arm.name} requires "
+                "online_constraint_feedback_path."
+            )
+
+        from aimai_ocl.constraint_feedback import (
+            ConstraintFeedbackStore,
+        )
+
+        constraint_feedback_store = (
+            ConstraintFeedbackStore.load_json(
+                feedback_path
+            )
+        )
+
     return run_episode(
         env_id=run_config.env_id,
         buyer_agent=buyer,
@@ -646,6 +707,7 @@ def _run_one_episode(
         enable_replan=arm.enable_replan,
         use_constraint_bank=arm.use_constraint_bank,
         constraint_bank=constraint_bank,
+        constraint_feedback_store=constraint_feedback_store,
         baseline_mode=arm.baseline_mode,
         seller_context_mode=arm.seller_context_mode,
         agentspec_adapter=agentspec_adapter,
